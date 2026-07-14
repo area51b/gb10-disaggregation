@@ -37,15 +37,30 @@ sudo docker run -d \
   --ipc host \
   --ulimit memlock=-1 \
   --shm-size=16g \
+  --cap-add=IPC_LOCK \
+  --device=/dev/infiniband \
+  -v /sys/class/infiniband:/sys/class/infiniband \
+  -v /sys/devices:/sys/devices \
   -v /mnt/models:/mnt/models \
   -e HF_HOME=/mnt/models/huggingface \
   -e HF_HUB_OFFLINE=1 \
   -e HF_TOKEN="${HF_TOKEN:-}" \
-  -e UCX_LOG_LEVEL=info \
   -e NIXL_LOG_LEVEL=DEBUG \
   -e VLLM_USE_FLASHINFER_SAMPLER=0 \
   -e ETCD_ENDPOINTS="192.168.1.26:2379" \
   -e NATS_SERVER="nats://192.168.1.26:4222" \
+  -e UCX_TLS=rc_x,rc,cuda_copy,cuda_ipc,gdr_copy,tcp \
+  -e UCX_NET_DEVICES=rocep1s0f1:1 \
+  -e UCX_IB_ADDR_TYPE=eth \
+  -e UCX_RNDV_SCHEME=get_zcopy \
+  -e UCX_RNDV_THRESH=0 \
+  -e UCX_RC_TIMEOUT=600s \
+  -e UCX_KEEPALIVE_INTERVAL=300s \
+  -e UCX_IB_GPU_DIRECT_RDMA=yes \
+  -e UCX_IB_REG_METHODS=odp,rcache,direct \
+  -e UCX_RCACHE_PURGE_ON_FORK=y \
+  -e UCX_IB_PREFER_NEAREST_DEVICE=y \
+  -e UCX_LOG_LEVEL=info \
   nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.2.1-cuda13 \
   python3 -m dynamo.vllm \
     --model "$MODEL" \
@@ -54,6 +69,7 @@ sudo docker run -d \
     --disaggregation-mode decode \
     --kv-transfer-config '{"kv_connector":"NixlConnector","kv_role":"kv_consumer","kv_rank":0,"kv_parallel_size":1}' \
     --kv-events-config '{"enable_kv_cache_events":false}' \
+    --no-enable-prefix-caching \
     $EXTRA_ARGS
 
 echo "Decode worker starting. Watch logs with:"
