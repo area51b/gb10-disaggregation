@@ -6,11 +6,11 @@
 set -e
 
 # Stop existing frontend container if running
-docker stop dynamo-frontend 2>/dev/null || true
+sudo docker stop dynamo-frontend 2>/dev/null || true
 
 echo "Starting Dynamo frontend on port 8000..."
 
-docker run --rm -d \
+sudo docker run --rm -d \
   --name dynamo-frontend \
   --network host \
   -e ETCD_ENDPOINTS="192.168.1.24:2379" \
@@ -20,5 +20,5 @@ docker run --rm -d \
     --port 8000
 
 echo "Frontend starting. Watch logs with:"
-echo "  docker logs -f dynamo-frontend"
+echo "sudo docker logs -f dynamo-frontend"
 echo "Wait for: Uvicorn running on http://0.0.0.0:8000"

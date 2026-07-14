@@ -20,7 +20,7 @@ set -e
 GPU_MEM_UTIL="${GPU_MEM_UTIL:-0.90}"
 
 # Stop existing prefill container if running
-docker stop dynamo-prefill 2>/dev/null || true
+sudo docker stop dynamo-prefill 2>/dev/null || true
 
 echo "Starting prefill worker: $MODEL (MAX_MODEL_LEN=$MAX_MODEL_LEN)"
 
@@ -30,7 +30,7 @@ if [[ "$MODEL" == *"gemma"* ]]; then
   EXTRA_ARGS="--language-model-only"
 fi
 
-docker run --rm -d \
+sudo docker run --rm -d \
   --name dynamo-prefill \
   --network host \
   --gpus all \
@@ -54,5 +54,5 @@ docker run --rm -d \
     $EXTRA_ARGS
 
 echo "Prefill worker starting. Watch logs with:"
-echo "  docker logs -f dynamo-prefill"
+echo "sudo docker logs -f dynamo-prefill"
 echo "Wait for: Registered endpoint 'dynamo.prefill.generate'"
