@@ -15,7 +15,7 @@ Arguments:
   --concurrency Number of concurrent requests (default: 1)
   --max-tokens  Max output tokens per request (default: 256)
   --tag         Label for this run: disaggregated | single-node (default: disaggregated)
-  --endpoint    Dynamo/vLLM endpoint (default: http://192.168.68.120:8000)
+  --endpoint    Dynamo/vLLM endpoint (default: http://192.168.1.24:8000)
   --no-warmup   Skip warmup request
 """
 
@@ -29,7 +29,7 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 
-ENDPOINT = "http://192.168.68.120:8000"
+ENDPOINT = "http://192.168.1.24:8000"
 
 # ── Prompt sets ──────────────────────────────────────────────────────────────
 

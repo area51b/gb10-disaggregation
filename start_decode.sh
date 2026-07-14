@@ -42,7 +42,7 @@ docker run --rm -d \
   -e HF_HUB_OFFLINE=1 \
   -e HF_TOKEN="${HF_TOKEN:-}" \
   -e VLLM_USE_FLASHINFER_SAMPLER=0 \
-  -e ETCD_ENDPOINTS="192.168.68.120:2379" \
+  -e ETCD_ENDPOINTS="192.168.1.24:2379" \
   nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.2.1-cuda13 \
   python3 -m dynamo.sdk.ext.vllm.worker \
     --model "$MODEL" \

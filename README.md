@@ -12,7 +12,7 @@ Companion to the article series:
 
 | Node | Role | Management IP | KV Cache IP | NFS IP |
 |---|---|---|---|---|
-| gx10-9c8c | decode + etcd + frontend | 192.168.68.120 | 10.88.0.2 | 10.77.0.2 |
+| gx10-9c8c | decode + etcd + frontend | 192.168.1.24 | 10.88.0.2 | 10.77.0.2 |
 | gx10-4a61 | prefill | 192.168.68.119 | 10.88.0.1 | 10.77.0.1 |
 
 - GB10 Grace Blackwell Superchip per node (sm_121)
@@ -42,8 +42,8 @@ export VLLM_USE_FLASHINFER_SAMPLER=0
 --language-model-only
 
 # 3. etcd endpoint must not have http:// prefix
-ETCD_ENDPOINTS="192.168.68.120:2379"   # correct
-ETCD_ENDPOINTS="http://192.168.68.120:2379"  # wrong — silent failure
+ETCD_ENDPOINTS="192.168.1.24:2379"   # correct
+ETCD_ENDPOINTS="http://192.168.1.24:2379"  # wrong — silent failure
 ```
 
 ---
@@ -69,7 +69,7 @@ MODEL=google/gemma-3-12b-it MAX_MODEL_LEN=131072 ./start_prefill.sh
 
 # 5. gx10-9c8c — start web UI proxy (optional)
 python3 serve.py
-# open: http://192.168.68.120:9999/dynamo_chat.html
+# open: http://192.168.1.24:9999/dynamo_chat.html
 ```
 
 ---
