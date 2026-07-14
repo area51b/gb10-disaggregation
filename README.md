@@ -11,13 +11,14 @@ Companion to the article series:
 ## Hardware
 
 | Node | Role | Management IP |
-|---|---|---|---|---|
+|---|---|---|
 | promaxgb10-f51e | decode + etcd + frontend | 192.168.1.26 |
 | promaxgb10-f525 | prefill | 192.168.1.24 |
 
-- GB10 Grace Blackwell Superchip per node (sm_121)
-- 128GB unified LPDDR5X (shared CPU + GPU memory)
-- 2× 200GbE ConnectX-7 NICs per node
+Components:
+* GB10 Grace Blackwell Superchip per node (sm_121)
+* 128GB unified LPDDR5X (shared CPU + GPU memory)
+* 1× 200GbE ConnectX-7 NICs per node
 
 ## Software
 
