@@ -7,10 +7,10 @@ set -e
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 echo "Starting etcd..."
-docker compose -f "$SCRIPT_DIR/docker-compose.yml" up -d etcd
+sudo docker compose -f "$SCRIPT_DIR/docker-compose.yml" up -d etcd
 
 echo "Waiting for etcd to be ready..."
-until docker exec etcd etcdctl endpoint health 2>/dev/null; do
+until sudo docker exec etcd etcdctl endpoint health 2>/dev/null; do
   sleep 2
 done
 
