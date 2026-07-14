@@ -6,11 +6,18 @@ services:
     entrypoint: /usr/local/bin/etcd
     environment:
       - ETCD_NAME=etcd
-      - ETCD_ADVERTISE_CLIENT_URLS=http://192.168.1.24:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://192.168.1.26:2379
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
-      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://192.168.1.24:2380
-      - ETCD_INITIAL_CLUSTER=etcd=http://192.168.1.24:2380
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://192.168.1.26:2380
+      - ETCD_INITIAL_CLUSTER=etcd=http://192.168.1.26:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
       - ETCD_INITIAL_CLUSTER_TOKEN=dynamo-cluster
+    restart: unless-stopped
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: nats
+    network_mode: host
+    command: ["-js", "--trace"]
     restart: unless-stopped

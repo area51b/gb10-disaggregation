@@ -13,9 +13,10 @@ echo "Starting Dynamo frontend on port 8000..."
 sudo docker run --rm -d \
   --name dynamo-frontend \
   --network host \
-  -e ETCD_ENDPOINTS="192.168.1.24:2379" \
+  -e ETCD_ENDPOINTS="192.168.1.26:2379" \
+  -e NATS_SERVER="nats://192.168.1.26:4222" \
   nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.2.1-cuda13 \
-  python3 -m dynamo.sdk.ext.vllm.frontend \
+  python3 -m dynamo.frontend \
     --host 0.0.0.0 \
     --port 8000
 

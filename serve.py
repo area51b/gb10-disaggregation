@@ -4,10 +4,10 @@ serve.py — CORS proxy for the Dynamo web UI.
 Proxies requests from port 9999 to the Dynamo frontend on port 8000,
 adding CORS headers so the browser-based chat UI can make requests.
 
-Run on 192.168.1.24:
+Run on 192.168.1.26:
   python3 serve.py
 
-Then open: http://192.168.1.24:9999/dynamo_chat.html
+Then open: http://192.168.1.26:9999/dynamo_chat.html
 """
 
 import http.server
@@ -84,6 +84,6 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
 if __name__ == "__main__":
     server = http.server.HTTPServer(("0.0.0.0", PORT), ProxyHandler)
     print(f"CORS proxy running on http://0.0.0.0:{PORT}")
-    print(f"Open: http://192.168.1.24:{PORT}/dynamo_chat.html")
+    print(f"Open: http://192.168.1.26:{PORT}/dynamo_chat.html")
     print(f"Proxying to: {UPSTREAM}")
     server.serve_forever()
