@@ -41,6 +41,8 @@ sudo docker run -d \
   -e HF_HOME=/mnt/models/huggingface \
   -e HF_HUB_OFFLINE=1 \
   -e HF_TOKEN="${HF_TOKEN:-}" \
+  -e UCX_LOG_LEVEL=info \
+  -e NIXL_LOG_LEVEL=DEBUG \
   -e VLLM_USE_FLASHINFER_SAMPLER=0 \
   -e ETCD_ENDPOINTS="192.168.1.26:2379" \
   -e NATS_SERVER="nats://192.168.1.26:4222" \
