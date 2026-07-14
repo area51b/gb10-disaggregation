@@ -1,19 +1,19 @@
-# DGX Spark — NVIDIA Dynamo Disaggregated Inference
+# Dell Pro Max with GB10 — NVIDIA Dynamo Disaggregated Inference
 
-Scripts and benchmark tools for running NVIDIA Dynamo disaggregated inference on two ASUS Ascent GX10 (DGX Spark) nodes.
+Scripts and benchmark tools for running NVIDIA Dynamo disaggregated inference on two Dell Pro Max with GB10 nodes.
 
 Companion to the article series:
-- **Part 1:** How to Run NVIDIA Dynamo Disaggregated Inference on Two DGX Sparks *(setup guide)*
-- **Part 2:** What Actually Happens When You Benchmark Disaggregated Inference on Two DGX Sparks *(results)*
+- **Part 1:** How to Run NVIDIA Dynamo Disaggregated Inference on Two Dell Pro Max with GB10 *(setup guide)*
+- **Part 2:** What Actually Happens When You Benchmark Disaggregated Inference on Two Dell Pro Max with GB10 *(results)*
 
 ---
 
 ## Hardware
 
-| Node | Role | Management IP | KV Cache IP | NFS IP |
+| Node | Role | Management IP |
 |---|---|---|---|---|
-| gx10-9c8c | decode + etcd + frontend | 192.168.1.26 | 10.88.0.2 | 10.77.0.2 |
-| gx10-4a61 | prefill | 192.168.68.119 | 10.88.0.1 | 10.77.0.1 |
+| promaxgb10-f51e | decode + etcd + frontend | 192.168.1.26 |
+| promaxgb10-f525 | prefill | 192.168.1.24 |
 
 - GB10 Grace Blackwell Superchip per node (sm_121)
 - 128GB unified LPDDR5X (shared CPU + GPU memory)
@@ -23,14 +23,14 @@ Companion to the article series:
 
 | Component | Version |
 |---|---|
-| Container | `nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.1.0-dev.1` |
+| Container | `nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.2.1-cuda13` |
 | vLLM | 0.17.1 |
 | NIXL | 0.10.1 |
 | Service discovery | etcd |
 
 ---
 
-## Critical fixes for sm_121 (DGX Spark)
+## Critical fixes for sm_121
 
 Three environment variables / flags are required. Without them, workers crash silently.
 
@@ -51,23 +51,23 @@ ETCD_ENDPOINTS="http://192.168.1.26:2379"  # wrong — silent failure
 ## Startup sequence
 
 ```bash
-# 1. gx10-9c8c — start etcd
+# 1. promaxgb10-f51e — start etcd
 bash start_infra.sh
 # wait: ==> etcd is ready
 
-# 2. gx10-9c8c — start decode worker
+# 2. promaxgb10-f51e — start decode worker
 MODEL=google/gemma-3-12b-it MAX_MODEL_LEN=131072 ./start_decode.sh
 # wait: Registered endpoint 'dynamo.backend.generate'
 
-# 3. gx10-4a61 — start prefill worker
+# 3. promaxgb10-f525 — start prefill worker
 MODEL=google/gemma-3-12b-it MAX_MODEL_LEN=131072 ./start_prefill.sh
 # wait: Registered endpoint 'dynamo.prefill.generate'
 
-# 4. gx10-9c8c — start HTTP frontend
+# 4. promaxgb10-f51e — start HTTP frontend
 ./start_frontend.sh
 # wait: Uvicorn running on http://0.0.0.0:8000
 
-# 5. gx10-9c8c — start web UI proxy (optional)
+# 5. promaxgb10-f51e — start web UI proxy (optional)
 python3 serve.py
 # open: http://192.168.1.26:9999/dynamo_chat.html
 ```
@@ -92,16 +92,8 @@ See `models.env` for all values. Key constraints:
 ## Running benchmarks
 
 ```bash
-# Single disaggregated run
-python3 benchmark.py \
-  --model google/gemma-3-12b-it \
-  --requests 10 \
-  --prompt-len medium \
-  --concurrency 1 \
-  --tag disaggregated
-
-# All single-node baselines (automated, unattended)
-HF_TOKEN=your_token ./benchmark_singlenode.sh
+# AIPerf for benchmarking (automated, unattended)
+./benchmark.sh
 ```
 
 Prompt sizes: `short` (~5 tokens), `medium` (~100 tokens), `long` (~300 tokens), `xlarge` (~16K tokens), `xxlarge` (~27.5K tokens)
@@ -114,29 +106,12 @@ Results saved as JSON to `results/`.
 
 | File | Node | Purpose |
 |---|---|---|
-| `docker-compose.yml` | gx10-9c8c | etcd service |
-| `start_infra.sh` | gx10-9c8c | Start etcd |
-| `start_decode.sh` | gx10-9c8c | Start decode worker |
-| `start_prefill.sh` | gx10-4a61 | Start prefill worker |
-| `start_frontend.sh` | gx10-9c8c | Start HTTP frontend |
-| `serve.py` | gx10-9c8c | CORS proxy for web UI |
-| `benchmark.py` | gx10-9c8c | Run benchmarks |
-| `benchmark_singlenode.sh` | gx10-9c8c | Automated single-node runs |
+| `docker-compose.yml` | promaxgb10-f51e | etcd service |
+| `start_infra.sh` | promaxgb10-f51e | Start etcd |
+| `start_decode.sh` | promaxgb10-f51e | Start decode worker |
+| `start_prefill.sh` | promaxgb10-f525 | Start prefill worker |
+| `start_frontend.sh` | promaxgb10-f51e | Start HTTP frontend |
+| `serve.py` | promaxgb10-f51e | CORS proxy for web UI |
+| `benchmark.sh` | promaxgb10-f51e | Run benchmarks |
 | `models.env` | both | Model IDs and MAX_MODEL_LEN |
 
----
-
-## NFS setup (summary)
-
-Model weights live on a USB SSD on gx10-9c8c, shared via NFS to gx10-4a61.
-NVMe-oF was tried first and caused repeated ext4 filesystem corruption on interrupted writes. NFS replaced it — zero errors since.
-
-```bash
-# gx10-9c8c (server) — /etc/exports
-/mnt/models 10.77.0.1(rw,sync,no_subtree_check,no_root_squash)
-
-# gx10-4a61 (client) — /etc/fstab
-10.77.0.2:/mnt/models /mnt/models nfs rsize=1048576,wsize=1048576,hard,intr,_netdev,nofail 0 0
-```
-
-> Do not add `noresvport` — the server requires privileged source ports.
