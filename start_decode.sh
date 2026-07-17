@@ -1,5 +1,5 @@
 #!/bin/bash
-# start_decode.sh — Run on gx10-9c8c
+# start_decode.sh
 # Starts the Dynamo vLLM decode worker.
 #
 # Usage:

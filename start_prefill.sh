@@ -1,5 +1,5 @@
 #!/bin/bash
-# start_prefill.sh — Run on gx10-4a61
+# start_prefill.sh
 # Starts the Dynamo vLLM prefill worker.
 #
 # Usage:

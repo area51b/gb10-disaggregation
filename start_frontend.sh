@@ -1,5 +1,5 @@
 #!/bin/bash
-# start_frontend.sh — Run on gx10-9c8c
+# start_frontend.sh
 # Starts the Dynamo HTTP frontend on port 8000.
 # Requires etcd and at least the decode worker to be running first.
 
