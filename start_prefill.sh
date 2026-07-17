@@ -51,8 +51,8 @@ sudo docker run -d \
   -e ETCD_ENDPOINTS="192.168.1.26:2379" \
   -e NATS_SERVER="nats://192.168.1.26:4222" \
   -e UCX_TLS=rc,rc_x,cuda_copy,cuda_ipc \
-  -e UCX_NET_DEVICES=rocep1s0f1:1,rocep1s0f0:1 \
-  -e NCCL_IB_HCA=rocep1s0f1,roceP2p1s0f1,rocep1s0f0,roceP2p1s0f0 \
+  -e UCX_NET_DEVICES=rocep1s0f1:1 \
+  -e NCCL_IB_HCA=rocep1s0f1,roceP2p1s0f1 \
   -e UCX_LOG_LEVEL=info \
   -e NIXL_LOG_LEVEL=INFO \
   nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.2.1-cuda13 \
